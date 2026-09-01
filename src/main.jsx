@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { loadStripe } from '@stripe/stripe-js';
 import './styles.css';
 
 const pricing = {
@@ -8,6 +9,8 @@ const pricing = {
   extraWeight: 75,
   extraDay: 20,
   deposit: 150,
+  maxExtraTons: 2,
+  maxExtraDays: 30,
 };
 
 const accepted = [
@@ -77,13 +80,178 @@ function todayISO() {
   return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
 }
 
-function App() {
-  const config = appConfig();
+function totalDue(extraTons, extraDays) {
+  return pricing.base + extraTons * pricing.extraWeight + extraDays * pricing.extraDay + pricing.deposit;
+}
+
+// Custom on-page checkout: collects booking details, asks our backend
+// (Worker) to create a Stripe PaymentIntent for the correct amount, then
+// mounts Stripe's Payment Element right on this page — no redirect.
+function CustomCheckout({ config }) {
+  const [phase, setPhase] = useState('details'); // details -> payment -> success
+  const [extraTons, setExtraTons] = useState(0);
+  const [extraDays, setExtraDays] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [details, setDetails] = useState(null);
+
+  const stripeRef = useRef(null);
+  const elementsRef = useRef(null);
+  const paymentElRef = useRef(null);
+
+  const total = totalDue(extraTons, extraDays);
+
+  const handleDetailsSubmit = async (event) => {
+    event.preventDefault();
+    setErrorMsg('');
+    const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+    setDetails(data);
+    setLoading(true);
+
+    try {
+      const res = await fetch(config.PAYMENT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, extraTons, extraDays }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Could not start payment. Please try again.');
+      }
+
+      if (!stripeRef.current) {
+        stripeRef.current = await loadStripe(config.STRIPE_PUBLISHABLE_KEY);
+      }
+      const elements = stripeRef.current.elements({
+        clientSecret: result.clientSecret,
+        appearance: {
+          theme: 'night',
+          variables: {
+            colorPrimary: '#f2b705',
+            colorBackground: '#090909',
+            colorText: '#f7f4ea',
+            colorDanger: '#ff6b6b',
+            fontFamily: 'Inter, sans-serif',
+            borderRadius: '14px',
+          },
+        },
+      });
+      elementsRef.current = elements;
+      setPhase('payment');
+    } catch (err) {
+      const friendly = err instanceof TypeError ? "Couldn't reach the payment server. Please try again in a moment." : err.message;
+      setErrorMsg(friendly || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    loadAnalytics(config);
-  }, []);
+    if (phase === 'payment' && elementsRef.current && paymentElRef.current) {
+      const paymentElement = elementsRef.current.create('payment');
+      paymentElement.mount(paymentElRef.current);
+      return () => paymentElement.unmount();
+    }
+  }, [phase]);
 
+  const handlePaySubmit = async (event) => {
+    event.preventDefault();
+    setErrorMsg('');
+    setLoading(true);
+
+    const { error } = await stripeRef.current.confirmPayment({
+      elements: elementsRef.current,
+      redirect: 'if_required',
+      confirmParams: {
+        receipt_email: details?.email,
+      },
+    });
+
+    setLoading(false);
+    if (error) {
+      setErrorMsg(error.message || 'Payment failed. Please check your card details and try again.');
+      return;
+    }
+    setPhase('success');
+  };
+
+  if (phase === 'success') {
+    return (
+      <div className="note success">
+        Booking confirmed and paid — thank you, {details?.name?.split(' ')[0] || 'friend'}! We'll text or call{' '}
+        {details?.phone} to confirm the drop-off window for {details?.date}.
+      </div>
+    );
+  }
+
+  if (phase === 'payment') {
+    return (
+      <>
+        <p className="panel-copy">Total due: ${total}. Enter payment details below to complete your booking.</p>
+        <form className="booking-form" onSubmit={handlePaySubmit}>
+          <div ref={paymentElRef} />
+          {errorMsg && <div className="note error">{errorMsg}</div>}
+          <button className="btn btn-primary" type="submit" disabled={loading}>
+            {loading ? 'Processing…' : `Pay $${total} Now`}
+          </button>
+          <button className="btn btn-secondary" type="button" onClick={() => setPhase('details')} disabled={loading}>
+            Back
+          </button>
+        </form>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="panel-copy">Fill in your booking details, then pay securely — right here, no redirect.</p>
+      <form className="booking-form" onSubmit={handleDetailsSubmit}>
+        {fields.map((field) => (
+          <label key={field.name}>
+            <span>{field.label}</span>
+            <input
+              name={field.name}
+              type={field.type}
+              required={field.required}
+              min={field.min ? todayISO() : undefined}
+            />
+          </label>
+        ))}
+        <label>
+          <span>Extra tons beyond the {pricing.includedTons} included (${pricing.extraWeight}/ton)</span>
+          <select name="extraTonsSelect" value={extraTons} onChange={(e) => setExtraTons(Number(e.target.value))}>
+            {Array.from({ length: pricing.maxExtraTons + 1 }, (_, n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Extra days beyond the 3-day rental (${pricing.extraDay}/day)</span>
+          <select name="extraDaysSelect" value={extraDays} onChange={(e) => setExtraDays(Number(e.target.value))}>
+            {Array.from({ length: pricing.maxExtraDays + 1 }, (_, n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Notes</span>
+          <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests" />
+        </label>
+        <div className="price-total">Total due today: ${total} (includes ${pricing.deposit} refundable deposit)</div>
+        {errorMsg && <div className="note error">{errorMsg}</div>}
+        <button className="btn btn-primary" type="submit" disabled={loading}>
+          {loading ? 'Loading payment…' : 'Continue to Payment'}
+        </button>
+      </form>
+    </>
+  );
+}
+
+function EmailFallbackForm({ config }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget).entries());
@@ -95,19 +263,46 @@ function App() {
         `Email: ${data.email}`,
         `Address: ${data.address}`,
         `Desired date: ${data.date}`,
-        `Dumpster size: ${data.size}`,
         `Notes: ${data.notes || 'N/A'}`,
         'Payment required before drop-off.',
       ].join('%0A')
     );
-
-    if (config.STRIPE_PAYMENT_URL) {
-      window.location.href = config.STRIPE_PAYMENT_URL;
-      return;
-    }
-
     window.location.href = `mailto:${config.BOOKING_EMAIL}?subject=Golden%20Haul%20Booking%20Request&body=${body}`;
   };
+
+  return (
+    <>
+      <p className="panel-copy">Submit the request and we'll follow up to collect payment. Payment is required before drop-off.</p>
+      <form className="booking-form" onSubmit={handleSubmit}>
+        {fields.map((field) => (
+          <label key={field.name}>
+            <span>{field.label}</span>
+            <input
+              name={field.name}
+              type={field.type}
+              required={field.required}
+              min={field.min ? todayISO() : undefined}
+            />
+          </label>
+        ))}
+        <label>
+          <span>Notes</span>
+          <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests" />
+        </label>
+        <button className="btn btn-primary" type="submit">Send Booking Request</button>
+      </form>
+      <div className="note">Online payment isn't connected yet — requests go to {config.BOOKING_EMAIL} for manual follow-up.</div>
+    </>
+  );
+}
+
+function App() {
+  const config = appConfig();
+  const paymentReady = Boolean(config.STRIPE_PUBLISHABLE_KEY && config.PAYMENT_API_URL);
+
+  useEffect(() => {
+    loadAnalytics(config);
+  }, []);
 
   return (
     <>
@@ -144,50 +339,12 @@ function App() {
               <li>After 3-day rental period: ${pricing.extraDay} per additional day</li>
               <li>${pricing.deposit} refundable security deposit, charged at booking — refunded after a clean, on-time return; forfeited for prohibited materials or damage</li>
             </ul>
-            <div className="price-total">Due at booking: ${pricing.base + pricing.deposit}</div>
+            <div className="price-total">Due at booking: ${pricing.base + pricing.deposit}+</div>
           </article>
 
           <article className="panel book" id="book">
             <h2>Book &amp; Pay</h2>
-            {config.STRIPE_PAYMENT_URL ? (
-              <>
-                <p className="panel-copy">
-                  You'll enter your address, drop-off date, and notes on the secure Stripe payment page.
-                  Total due today: ${pricing.base + pricing.deposit} (${pricing.base} rental + ${pricing.deposit} refundable deposit).
-                </p>
-                <a className="btn btn-primary" href={config.STRIPE_PAYMENT_URL}>Proceed to Payment</a>
-              </>
-            ) : (
-              <>
-                <p className="panel-copy">Submit the request and we'll follow up to collect payment. Payment is required before drop-off.</p>
-                <form className="booking-form" onSubmit={handleSubmit}>
-                  {fields.map((field) => (
-                    <label key={field.name}>
-                      <span>{field.label}</span>
-                      <input
-                        name={field.name}
-                        type={field.type}
-                        required={field.required}
-                        min={field.min ? todayISO() : undefined}
-                      />
-                    </label>
-                  ))}
-                  <label>
-                    <span>Dumpster size</span>
-                    <select name="size" required>
-                      <option value="">Select size</option>
-                      <option>10-yard</option>
-                    </select>
-                  </label>
-                  <label>
-                    <span>Notes</span>
-                    <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests" />
-                  </label>
-                  <button className="btn btn-primary" type="submit">Send Booking Request</button>
-                </form>
-                <div className="note">Online payment isn't connected yet — requests go to {config.BOOKING_EMAIL} for manual follow-up.</div>
-              </>
-            )}
+            {paymentReady ? <CustomCheckout config={config} /> : <EmailFallbackForm config={config} />}
           </article>
 
           <article className="panel materials">

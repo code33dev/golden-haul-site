@@ -153,6 +153,21 @@ textarea { resize: vertical; min-height: 110px; }
   background: rgba(242, 183, 5, 0.08);
   color: #f6e7b0;
 }
+.note.success {
+  border-color: rgba(120, 220, 140, 0.35);
+  background: rgba(120, 220, 140, 0.1);
+  color: #bdf2c8;
+}
+.note.error {
+  border-color: rgba(255, 107, 107, 0.35);
+  background: rgba(255, 107, 107, 0.1);
+  color: #ffc4c4;
+}
+.btn-secondary[disabled],
+.btn-primary[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .two-up {
   display: grid;
   gap: 18px;
