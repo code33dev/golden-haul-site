@@ -4,131 +4,53 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Golden Haul Rentals | Book Your Dumpster</title>
-    <meta
-      name="description"
-      content="Golden Haul Rentals offers fast dumpster delivery, transparent pricing, and Stripe-ready online booking for your next cleanup project."
-    />
+    <meta name="description" content="Golden Haul Rentals offers fast dumpster delivery, transparent pricing, and Stripe-ready online booking for your next cleanup project." />
     <meta property="og:title" content="Golden Haul Rentals | Book Your Dumpster" />
-    <meta
-      property="og:description"
-      content="Premium black-and-gold dumpster rental booking site with clear pricing and payment-before-drop-off flow."
-    />
+    <meta property="og:description" content="Premium black-and-gold dumpster rental booking site with clear pricing and payment-before-drop-off flow." />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#000000" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-      :root {
-        --bg: #050505;
-        --panel: #101010;
-        --gold: #f2b705;
-        --gold-dark: #c68e00;
-        --text: #f7f4ea;
-        --muted: #b5b1a6;
-        --line: rgba(242, 183, 5, 0.28);
-      }
-      * { box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-        margin: 0;
-        font-family: Inter, sans-serif;
-        background: radial-gradient(circle at top, rgba(242,183,5,0.08), transparent 30%), var(--bg);
-        color: var(--text);
-      }
-      a { color: inherit; }
-      .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
-      .hero {
-        padding: 32px 0 24px;
-        text-align: center;
-      }
-      .logo {
-        width: min(520px, 92vw);
-        display: block;
-        margin: 0 auto 18px;
-      }
-      .eyebrow {
-        color: var(--gold);
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        font-size: 0.8rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-      h1, h2, h3 {
-        font-family: Oswald, sans-serif;
-        letter-spacing: 0.02em;
-        margin: 0;
-      }
-      h1 { font-size: clamp(2.6rem, 7vw, 5rem); line-height: 0.95; }
-      .sub {
-        max-width: 760px;
-        margin: 18px auto 0;
-        color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.7;
-      }
-      .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
-      .btn {
-        display: inline-flex; align-items: center; justify-content: center;
-        padding: 15px 22px; border-radius: 999px; text-decoration: none;
-        font-weight: 700; border: 1px solid transparent; transition: 0.2s ease;
-      }
-      .btn.primary { background: linear-gradient(180deg, #ffd84d, var(--gold)); color: #111; }
-      .btn.secondary { border-color: var(--line); background: rgba(255,255,255,0.02); }
-      .btn:hover { transform: translateY(-1px); }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 18px;
-        margin: 28px 0 48px;
-      }
-      .card {
-        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-        border: 1px solid rgba(242,183,5,0.18);
-        border-radius: 22px;
-        padding: 22px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-      }
-      .card h2 { font-size: clamp(1.9rem, 4vw, 3rem); color: var(--gold); margin-bottom: 10px; }
-      .card h3 { font-size: 1.3rem; color: var(--gold); margin-bottom: 10px; }
-      .pricing { grid-column: span 7; }
-      .book { grid-column: span 5; }
-      .two-up { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-      ul { margin: 0; padding-left: 20px; color: var(--text); line-height: 1.8; }
-      .price { font-size: 2rem; font-family: Oswald, sans-serif; color: var(--text); }
-      .small { color: var(--muted); font-size: 0.95rem; }
-      form { display: grid; gap: 12px; }
-      input, select, textarea {
-        width: 100%; padding: 14px 15px; border-radius: 14px; border: 1px solid rgba(242,183,5,0.18);
-        background: #090909; color: var(--text); font: inherit;
-      }
-      textarea { min-height: 110px; resize: vertical; }
-      .note {
-        margin-top: 12px; padding: 14px 16px; border-radius: 14px;
-        background: rgba(242,183,5,0.08); border: 1px solid rgba(242,183,5,0.2);
-        color: #f6e7b0;
-      }
-      .section-title { margin: 0 0 14px; font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--gold); }
-      .materials { grid-column: span 12; }
-      .footer {
-        padding: 24px 0 44px; color: var(--muted); text-align: center; border-top: 1px solid rgba(242,183,5,0.14);
-        margin-top: 18px;
-      }
-      .phones { margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-      .phone {
-        padding: 12px 18px; border-radius: 999px; border: 1px solid rgba(242,183,5,0.2); text-decoration: none;
-        background: rgba(255,255,255,0.02);
-      }
-      .fleet-badge {
-        display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 10px 14px;
-        border-radius: 999px; background: rgba(242,183,5,0.1); color: #f7e08a; border: 1px solid rgba(242,183,5,0.2);
-        font-weight: 700;
-      }
-      @media (max-width: 860px) {
-        .pricing, .book, .materials { grid-column: span 12; }
-        .two-up { grid-template-columns: 1fr; }
-      }
+      :root { --bg:#050505; --panel:#101010; --gold:#f2b705; --gold-dark:#c68e00; --text:#f7f4ea; --muted:#b5b1a6; --line:rgba(242,183,5,.28); }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; font-family:Inter,sans-serif; background:radial-gradient(circle at top, rgba(242,183,5,.08), transparent 30%), var(--bg); color:var(--text); }
+      a { color:inherit; }
+      .wrap { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+      .hero { padding:32px 0 24px; text-align:center; }
+      .logo { width:min(520px, 92vw); display:block; margin:0 auto 18px; }
+      .eyebrow { color:var(--gold); text-transform:uppercase; letter-spacing:.18em; font-size:.8rem; font-weight:700; margin-bottom:10px; }
+      h1,h2,h3 { font-family:Oswald,sans-serif; letter-spacing:.02em; margin:0; }
+      h1 { font-size:clamp(2.6rem,7vw,5rem); line-height:.95; }
+      .sub { max-width:760px; margin:18px auto 0; color:var(--muted); font-size:1.05rem; line-height:1.7; }
+      .cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px; }
+      .btn { display:inline-flex; align-items:center; justify-content:center; padding:15px 22px; border-radius:999px; text-decoration:none; font-weight:700; border:1px solid transparent; transition:.2s ease; }
+      .btn.primary { background:linear-gradient(180deg, #ffd84d, var(--gold)); color:#111; }
+      .btn.secondary { border-color:var(--line); background:rgba(255,255,255,.02); }
+      .btn:hover { transform:translateY(-1px); }
+      .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; margin:28px 0 48px; }
+      .card { background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border:1px solid rgba(242,183,5,.18); border-radius:22px; padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+      .card h2 { font-size:clamp(1.9rem,4vw,3rem); color:var(--gold); margin-bottom:10px; }
+      .card h3 { font-size:1.3rem; color:var(--gold); margin-bottom:10px; }
+      .pricing { grid-column:span 7; }
+      .book { grid-column:span 5; }
+      .two-up { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+      ul { margin:0; padding-left:20px; color:var(--text); line-height:1.8; }
+      .price { font-size:2rem; font-family:Oswald,sans-serif; color:var(--text); }
+      .small { color:var(--muted); font-size:.95rem; }
+      form { display:grid; gap:12px; }
+      input, select, textarea { width:100%; padding:14px 15px; border-radius:14px; border:1px solid rgba(242,183,5,.18); background:#090909; color:var(--text); font:inherit; }
+      textarea { min-height:110px; resize:vertical; }
+      .note { margin-top:12px; padding:14px 16px; border-radius:14px; background:rgba(242,183,5,.08); border:1px solid rgba(242,183,5,.2); color:#f6e7b0; }
+      .section-title { margin:0 0 14px; font-size:clamp(1.8rem,4vw,2.6rem); color:var(--gold); }
+      .materials { grid-column:span 12; }
+      .footer { padding:24px 0 44px; color:var(--muted); text-align:center; border-top:1px solid rgba(242,183,5,.14); margin-top:18px; }
+      .phones { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+      .phone { padding:12px 18px; border-radius:999px; border:1px solid rgba(242,183,5,.2); text-decoration:none; background:rgba(255,255,255,.02); }
+      .fleet-badge { display:inline-flex; align-items:center; gap:8px; margin-top:16px; padding:10px 14px; border-radius:999px; background:rgba(242,183,5,.1); color:#f7e08a; border:1px solid rgba(242,183,5,.2); font-weight:700; }
+      @media (max-width:860px) { .pricing,.book,.materials { grid-column:span 12; } .two-up { grid-template-columns:1fr; } }
     </style>
   </head>
   <body>
@@ -137,10 +59,7 @@
         <img class="logo" src="logo.png" alt="Golden Haul Rentals logo" />
         <div class="eyebrow">Dumpster rentals • Book online • Pay before drop-off</div>
         <h1>Premium dumpster rental service built to turn clicks into booked jobs.</h1>
-        <p class="sub">
-          Golden Haul Rentals keeps the process simple: choose your dumpster, submit your booking request,
-          complete Stripe payment, and get confirmed for drop-off. Designed for fast ad traffic and a clean mobile experience.
-        </p>
+        <p class="sub">Golden Haul Rentals keeps the process simple: choose your dumpster, submit your booking request, complete Stripe payment, and get confirmed for drop-off. Designed for fast ad traffic and a clean mobile experience.</p>
         <div class="cta-row">
           <a class="btn primary" href="#book">Book Your Dumpster</a>
           <a class="btn secondary" href="tel:+13135057607">Call +1 (313) 505-7607</a>
@@ -164,20 +83,20 @@
 
         <article class="card book" id="book">
           <h2 class="section-title">Book &amp; Pay</h2>
-          <form>
-            <input type="text" placeholder="Full name" required />
-            <input type="tel" placeholder="Phone number" required />
-            <input type="email" placeholder="Email address" required />
-            <input type="text" placeholder="Service address or ZIP code" required />
-            <input type="date" required />
-            <select required>
+          <form id="booking-form">
+            <input name="name" type="text" placeholder="Full name" required />
+            <input name="phone" type="tel" placeholder="Phone number" required />
+            <input name="email" type="email" placeholder="Email address" required />
+            <input name="address" type="text" placeholder="Service address or ZIP code" required />
+            <input name="date" type="date" required />
+            <select name="size" required>
               <option value="">Dumpster size</option>
               <option>10-yard</option>
             </select>
-            <textarea placeholder="Notes, access instructions, or booking details"></textarea>
-            <a class="btn primary" href="#">Proceed to Stripe Payment</a>
+            <textarea name="notes" placeholder="Notes, access instructions, or booking details"></textarea>
+            <button class="btn primary" type="submit">Proceed to Stripe Payment</button>
           </form>
-          <div class="note">Payment is required before drop-off. Stripe checkout/payment link can be connected here.</div>
+          <div class="note">Payment is required before drop-off. Connect this form to Stripe Checkout or a Stripe Payment Link and your booking confirmation endpoint.</div>
         </article>
 
         <article class="card materials">
@@ -211,5 +130,17 @@
         <a class="phone" href="tel:+17343340268">+1 (734) 334-0268</a>
       </div>
     </footer>
+
+    <script>
+      const form = document.getElementById('booking-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        const message = encodeURIComponent(`Booking request:%0AName: ${data.name}%0APhone: ${data.phone}%0AEmail: ${data.email}%0AAddress: ${data.address}%0ADate: ${data.date}%0ASize: ${data.size}%0ANotes: ${data.notes || 'N/A'}`);
+        const stripeUrl = (window.STRIPE_PAYMENT_URL || '').trim();
+        if (stripeUrl) { window.location.href = stripeUrl; return; }
+        window.location.href = `mailto:bookings@goldenhaulrentals.com?subject=Golden%20Haul%20Booking%20Request&body=${message}`;
+      });
+    </script>
   </body>
 </html>
