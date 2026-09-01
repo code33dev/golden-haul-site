@@ -131,6 +131,7 @@ h1 {
 .materials { grid-column: span 12; }
 h2 { color: var(--gold); font-size: clamp(1.9rem, 4vw, 3rem); margin-bottom: 12px; }
 .price { font-family: Oswald, sans-serif; font-size: 2rem; margin-bottom: 10px; }
+.price-total { margin-top: 14px; font-weight: 700; color: var(--gold2); }
 .panel-copy { color: var(--muted); margin-top: 0; }
 ul { margin: 0; padding-left: 20px; line-height: 1.8; }
 .booking-form { display: grid; gap: 12px; }

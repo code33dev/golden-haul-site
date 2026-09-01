@@ -7,6 +7,7 @@ const pricing = {
   includedTons: 1,
   extraWeight: 75,
   extraDay: 20,
+  deposit: 150,
 };
 
 const accepted = [
@@ -139,41 +140,54 @@ function App() {
               <li>{pricing.includedTons} ton included</li>
               <li>Delivery &amp; pick-up included</li>
               <li>3-day rental</li>
-              <li>No hidden fees</li>
               <li>Extra weight: ${pricing.extraWeight} per ton</li>
               <li>After 3-day rental period: ${pricing.extraDay} per additional day</li>
+              <li>${pricing.deposit} refundable security deposit, charged at booking — refunded after a clean, on-time return; forfeited for prohibited materials or damage</li>
             </ul>
+            <div className="price-total">Due at booking: ${pricing.base + pricing.deposit}</div>
           </article>
 
           <article className="panel book" id="book">
             <h2>Book &amp; Pay</h2>
-            <p className="panel-copy">Submit the request and proceed to Stripe payment. Payment is required before drop-off.</p>
-            <form className="booking-form" onSubmit={handleSubmit}>
-              {fields.map((field) => (
-                <label key={field.name}>
-                  <span>{field.label}</span>
-                  <input
-                    name={field.name}
-                    type={field.type}
-                    required={field.required}
-                    min={field.min ? todayISO() : undefined}
-                  />
-                </label>
-              ))}
-              <label>
-                <span>Dumpster size</span>
-                <select name="size" required>
-                  <option value="">Select size</option>
-                  <option>10-yard</option>
-                </select>
-              </label>
-              <label>
-                <span>Notes</span>
-                <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests" />
-              </label>
-              <button className="btn btn-primary" type="submit">Proceed to Payment</button>
-            </form>
-            <div className="note">Stripe checkout/payment link and booking email are configured through app settings placeholders.</div>
+            {config.STRIPE_PAYMENT_URL ? (
+              <>
+                <p className="panel-copy">
+                  You'll enter your address, drop-off date, and notes on the secure Stripe payment page.
+                  Total due today: ${pricing.base + pricing.deposit} (${pricing.base} rental + ${pricing.deposit} refundable deposit).
+                </p>
+                <a className="btn btn-primary" href={config.STRIPE_PAYMENT_URL}>Proceed to Payment</a>
+              </>
+            ) : (
+              <>
+                <p className="panel-copy">Submit the request and we'll follow up to collect payment. Payment is required before drop-off.</p>
+                <form className="booking-form" onSubmit={handleSubmit}>
+                  {fields.map((field) => (
+                    <label key={field.name}>
+                      <span>{field.label}</span>
+                      <input
+                        name={field.name}
+                        type={field.type}
+                        required={field.required}
+                        min={field.min ? todayISO() : undefined}
+                      />
+                    </label>
+                  ))}
+                  <label>
+                    <span>Dumpster size</span>
+                    <select name="size" required>
+                      <option value="">Select size</option>
+                      <option>10-yard</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Notes</span>
+                    <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests" />
+                  </label>
+                  <button className="btn btn-primary" type="submit">Send Booking Request</button>
+                </form>
+                <div className="note">Online payment isn't connected yet — requests go to {config.BOOKING_EMAIL} for manual follow-up.</div>
+              </>
+            )}
           </article>
 
           <article className="panel materials">
