@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -27,15 +27,61 @@ const fields = [
   { name: 'phone', label: 'Phone number', type: 'tel', required: true },
   { name: 'email', label: 'Email address', type: 'email', required: true },
   { name: 'address', label: 'Service address or ZIP code', type: 'text', required: true },
-  { name: 'date', label: 'Desired drop-off date', type: 'date', required: true },
+  { name: 'date', label: 'Desired drop-off date', type: 'date', required: true, min: true },
 ];
 
 function appConfig() {
   return window.APP_CONFIG || {};
 }
 
+function loadAnalytics(config) {
+  if (config.GOOGLE_TAG_ID && !window.gtag) {
+    const loader = document.createElement('script');
+    loader.async = true;
+    loader.src = `https://www.googletagmanager.com/gtag/js?id=${config.GOOGLE_TAG_ID}`;
+    document.head.appendChild(loader);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag('js', new Date());
+    window.gtag('config', config.GOOGLE_TAG_ID);
+  }
+
+  if (config.META_PIXEL_ID && !window.fbq) {
+    (function (f, b, e, v, n, t, s) {
+      if (f.fbq) return;
+      n = f.fbq = function () {
+        n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+      };
+      n.push = n;
+      n.loaded = true;
+      n.version = '2.0';
+      n.queue = [];
+      t = b.createElement(e);
+      t.async = true;
+      t.src = v;
+      s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('init', config.META_PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+}
+
+function todayISO() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
+}
+
 function App() {
   const config = appConfig();
+
+  useEffect(() => {
+    loadAnalytics(config);
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -106,7 +152,12 @@ function App() {
               {fields.map((field) => (
                 <label key={field.name}>
                   <span>{field.label}</span>
-                  <input name={field.name} type={field.type} required={field.required} />
+                  <input
+                    name={field.name}
+                    type={field.type}
+                    required={field.required}
+                    min={field.min ? todayISO() : undefined}
+                  />
                 </label>
               ))}
               <label>
