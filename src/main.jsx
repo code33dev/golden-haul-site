@@ -67,12 +67,9 @@ function App() {
       <main className="shell">
         <section className="hero">
           <div className="logo-mark">
-            <div className="logo-trailer">▣</div>
-            <div>
-              <div className="brand">Golden Haul Rentals</div>
-              <div className="tagline">Book online • Pay before drop-off • Fast local service</div>
-            </div>
+            <img className="logo-img" src="/logo.png" alt="Golden Haul Rentals" />
           </div>
+          <div className="slogan-badge">Haul It The Golden Way!</div>
           <h1>Dumpster rental booking that keeps the customer flow simple.</h1>
           <p className="lead">
             A premium black-and-gold experience for fast calls, quick quoting, and secure payment before drop-off.

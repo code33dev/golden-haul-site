@@ -31,33 +31,24 @@ button, input, select, textarea { font: inherit; }
 }
 .logo-mark {
   display: inline-flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-  padding: 14px 18px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
+  justify-content: center;
+  margin-bottom: 10px;
 }
-.logo-trailer {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(180deg, var(--gold2), var(--gold));
-  color: #111;
-  font-weight: 800;
-  font-size: 1.2rem;
+.logo-img {
+  height: 140px;
+  width: auto;
 }
-.brand {
+.slogan-badge {
+  display: inline-flex;
+  margin: 0 auto 22px;
+  padding: 10px 20px;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  color: var(--gold);
   font-family: Oswald, sans-serif;
-  font-size: 1.5rem;
+  font-weight: 700;
   letter-spacing: 0.04em;
-}
-.tagline {
-  color: var(--muted);
-  font-size: 0.95rem;
+  text-transform: uppercase;
 }
 h1,h2,h3 {
   font-family: Oswald, sans-serif;
