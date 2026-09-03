@@ -38,6 +38,12 @@
     // Where booking requests are emailed.
     BOOKING_EMAIL: 'bookings@goldenhaulrentals.com',
 
+    // Free key from https://web3forms.com (paste your email, they send a key).
+    // WITH a key: bookings are delivered to BOOKING_EMAIL automatically.
+    // WITHOUT one: the site falls back to opening the customer's email app,
+    // which many phones cannot do — those bookings are lost silently.
+    WEB3FORMS_KEY: '',
+
     // Phone numbers shown on the page.
     PHONE_PRIMARY: '+13135057607',
     PHONE_SECONDARY: '+17343340268',
@@ -203,6 +209,10 @@ textarea { resize: vertical; min-height: 110px; }
 .summary dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; }
 .summary dt { color: var(--muted); font-size: 0.9rem; }
 .summary dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.send-status { margin: 14px 0 0; font-weight: 700; line-height: 1.5; }
+.send-status.pending { color: var(--muted); }
+.send-status.ok { color: #7bd88f; }
+.send-status.err { color: #ffb4b4; }
 .confirm-actions { display: grid; gap: 10px; margin-top: 16px; }
 .linkish {
   background: none;
@@ -374,6 +384,7 @@ textarea { resize: vertical; min-height: 110px; }
         <div class="summary">
           <dl id="summaryList"></dl>
         </div>
+        <p class="send-status" id="sendStatus" hidden></p>
         <div class="confirm-actions">
           <a class="btn btn-primary" id="sendEmailBtn" href="#">Send My Request</a>
           <a class="btn btn-primary" id="payBtn" href="#" style="display:none">Pay Now &amp; Lock In My Date</a>
@@ -529,13 +540,16 @@ textarea { resize: vertical; min-height: 110px; }
         '&client_reference_id=' + encodeURIComponent(ref);
       payBtn.textContent = 'Pay ' + money(cfg.PRICE_BASE) + ' Now & Lock In My Date';
       payBtn.style.display = '';
-      $('confirmNote').textContent =
-        'Step 1: tap "Send My Request" so we get your details. Step 2: tap "Pay ' +
-        money(cfg.PRICE_BASE) + ' Now" to secure your date. Your dumpster is scheduled once payment clears.';
+      $('confirmNote').textContent = cfg.WEB3FORMS_KEY
+        ? 'Your request is on its way to us. Tap "Pay ' + money(cfg.PRICE_BASE) +
+          ' Now" to lock in your date — your dumpster is scheduled once payment clears.'
+        : 'Step 1: tap "Send My Request" so we get your details. Step 2: tap "Pay ' +
+          money(cfg.PRICE_BASE) + ' Now" to secure your date. Your dumpster is scheduled once payment clears.';
     } else {
       payBtn.style.display = 'none';
-      $('confirmNote').textContent =
-        'Tap "Send My Request" to email us your details. We’ll reply with a payment link and confirm your drop-off time. Payment is required before delivery.';
+      $('confirmNote').textContent = cfg.WEB3FORMS_KEY
+        ? 'We’ve got your request. We’ll reply with a payment link and confirm your drop-off time. Payment is required before delivery.'
+        : 'Tap "Send My Request" to email us your details. We’ll reply with a payment link and confirm your drop-off time. Payment is required before delivery.';
     }
 
     formWrap.style.display = 'none';
@@ -544,7 +558,58 @@ textarea { resize: vertical; min-height: 110px; }
     confirmPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     track('Lead', { value: cfg.PRICE_BASE, currency: 'USD' });
+
+    deliver(data, lines);
   });
+
+  /* Deliver the booking to Web3Forms when a key is configured. The customer's
+     own email app is only a fallback: many phones have none set up, and a
+     booking lost that way fails silently. */
+  function deliver(data, lines) {
+    var sendBtn = $('sendEmailBtn');
+    var status = $('sendStatus');
+
+    if (!cfg.WEB3FORMS_KEY) {
+      sendBtn.style.display = '';
+      status.hidden = true;
+      return;
+    }
+
+    sendBtn.style.display = 'none';
+    status.hidden = false;
+    status.className = 'send-status pending';
+    status.textContent = 'Sending your request\u2026';
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: cfg.WEB3FORMS_KEY,
+        subject: 'Booking request \u2014 ' + data.name + ' \u2014 ' + data.date,
+        from_name: 'Golden Haul Rentals website',
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        drop_off_date: data.date,
+        dumpster_size: data.size,
+        notes: data.notes || 'None',
+        message: lines.join('\n')
+      })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (!r || !r.success) { throw new Error('rejected'); }
+        status.className = 'send-status ok';
+        status.textContent = '\u2713 Request received. We\u2019ll be in touch shortly.';
+      })
+      .catch(function () {
+        status.className = 'send-status err';
+        status.textContent = 'We couldn\u2019t send that automatically \u2014 tap below to email it to us, or give us a call.';
+        sendBtn.style.display = '';
+      });
+  }
 
   $('editBtn').addEventListener('click', function () {
     confirmPanel.classList.remove('is-visible');

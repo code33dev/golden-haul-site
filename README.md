@@ -36,6 +36,7 @@ Open `index.html`. Everything you'd normally want to change lives in the
 |---|---|
 | `STRIPE_PAYMENT_URL` | Your Stripe Payment Link. Leave `''` and the site collects bookings by email only. |
 | `BOOKING_EMAIL` | Where booking requests get emailed. |
+| `WEB3FORMS_KEY` | Free key from [web3forms.com](https://web3forms.com). **Set this.** See below. |
 | `PHONE_PRIMARY` / `PHONE_SECONDARY` | Phone numbers shown on the page. |
 | `META_PIXEL_ID` | Facebook/Instagram ads pixel. Leave `''` to keep it off. |
 | `GOOGLE_TAG_ID` | Google Analytics / Ads tag. Leave `''` to keep it off. |
@@ -51,18 +52,26 @@ change the number in one place and the page updates itself.
 
 ## How booking works
 
-There is no server, so bookings are captured by email:
+There is no server. Bookings are delivered by Web3Forms, a free form relay.
 
-1. Customer fills the form → sees a confirmation panel with their details
-2. **Send My Request** opens their email app with everything prefilled to you
-3. **Pay Now** (only appears once `STRIPE_PAYMENT_URL` is set) sends them to
-   Stripe, carrying their email and a `client_reference_id` so you can match
-   the payment to the booking
+**Set `WEB3FORMS_KEY` before running any ads.** Go to
+[web3forms.com](https://web3forms.com), enter your email, and they send you an
+access key. Paste it into `APP_CONFIG`. That's the whole setup — no account,
+no dashboard.
 
-**Known weakness:** step 2 depends on the customer actually having an email
-app set up. Some mobile users won't. A form backend (Formspree, Web3Forms —
-both have free tiers) would make this reliable and is a small change to the
-`sendEmailBtn` handler. Worth doing before spending money on ads.
+**With a key set:**
+
+1. Customer submits → sees a confirmation panel with their details
+2. The booking is POSTed to Web3Forms and lands in `BOOKING_EMAIL` inbox
+3. **Pay Now** (appears once `STRIPE_PAYMENT_URL` is set) sends them to Stripe,
+   carrying `prefilled_email` and a `client_reference_id` so you can match the
+   payment to the booking
+4. If the send fails, the page falls back to opening their email app and says
+   so — the booking is never silently dropped
+
+**Without a key**, the site only opens the customer's email app. Many phones
+have no mail app configured, and those bookings vanish with no error on either
+end. This is the single most expensive thing to leave unset.
 
 ---
 
