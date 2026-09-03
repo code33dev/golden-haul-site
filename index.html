@@ -1,28 +1,591 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <title>Golden Haul Rentals | Book Your Dumpster</title>
-    <meta name="description" content="Golden Haul Rentals offers fast dumpster delivery, transparent pricing, and Stripe-ready booking for your next cleanup project." />
-    <meta property="og:title" content="Golden Haul Rentals | Book Your Dumpster" />
-    <meta property="og:description" content="Premium black-and-gold dumpster rental booking site with clear pricing and payment-before-drop-off flow." />
-    <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <script>
-      window.APP_CONFIG = {
-        STRIPE_PAYMENT_URL: '',
-        META_PIXEL_ID: '',
-        GOOGLE_TAG_ID: '',
-        BOOKING_EMAIL: 'bookings@goldenhaulrentals.com',
-      };
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#050505" />
+
+<title>Golden Haul Rentals | 10-Yard Dumpster Rental &amp; Online Booking</title>
+<meta name="description" content="Golden Haul Rentals: $370 flat-rate 10-yard dumpster rental. 1 ton included, 3-day rental, delivery and pick-up included, no hidden fees. Book online and pay before drop-off." />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Golden Haul Rentals" />
+<meta property="og:title" content="Golden Haul Rentals | 10-Yard Dumpster Rental" />
+<meta property="og:description" content="$370 flat rate. 1 ton included. 3-day rental. Delivery and pick-up included. No hidden fees. Book online in under a minute." />
+<!-- LAUNCH TODO: once your domain is live, fill these two in (needed for Facebook/Instagram ad link previews):
+<meta property="og:url" content="https://goldenhaulrentals.com/" />
+<meta property="og:image" content="https://goldenhaulrentals.com/social-preview.jpg" />
+-->
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050505'/%3E%3Cg fill='%23f2b705'%3E%3Crect x='7' y='17' width='50' height='6' rx='3'/%3E%3Cpath d='M11 26h42l-6 22H17z'/%3E%3Ccircle cx='22' cy='53' r='4'/%3E%3Ccircle cx='42' cy='53' r='4'/%3E%3C/g%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- ============================================================
+     GOLDEN HAUL RENTALS — SETTINGS
+     This is the ONLY block you need to edit for launch.
+     Everything else on the page reads from here.
+     ============================================================ -->
+<script>
+  window.APP_CONFIG = {
+    // Paste your Stripe Payment Link here (starts with https://buy.stripe.com/...).
+    // Leave as '' and the site will collect bookings by email only.
+    STRIPE_PAYMENT_URL: '',
+
+    // Where booking requests are emailed.
+    BOOKING_EMAIL: 'bookings@goldenhaulrentals.com',
+
+    // Phone numbers shown on the page.
+    PHONE_PRIMARY: '+13135057607',
+    PHONE_SECONDARY: '+17343340268',
+
+    // Ad tracking. Paste your IDs to turn these on; leave '' to keep them off.
+    META_PIXEL_ID: '',
+    GOOGLE_TAG_ID: '',
+
+    // Pricing. Change these numbers any time — the page updates itself.
+    PRICE_BASE: 370,
+    INCLUDED_TONS: 1,
+    RENTAL_DAYS: 3,
+    EXTRA_TON: 75,
+    EXTRA_DAY: 20,
+
+    // Shown in the gold pill under the hero.
+    FLEET_COUNT: 2,
+  };
+</script>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #050505;
+  --gold: #f2b705;
+  --gold2: #ffd84d;
+  --text: #f7f4ea;
+  --muted: #bbb6a7;
+  --line: rgba(242, 183, 5, 0.22);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(circle at top, rgba(242, 183, 5, 0.08), transparent 30%), var(--bg);
+  color: var(--text);
+}
+a { color: inherit; }
+button, input, select, textarea { font: inherit; }
+img, svg { max-width: 100%; }
+
+.shell {
+  width: min(1140px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 44px;
+}
+.hero { text-align: center; padding: 20px 0 10px; }
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  text-align: left;
+}
+.logo-trailer {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, var(--gold2), var(--gold));
+}
+.logo-trailer svg { width: 34px; height: 34px; display: block; }
+.brand { font-family: Oswald, sans-serif; font-size: 1.5rem; letter-spacing: 0.04em; }
+.tagline { color: var(--muted); font-size: 0.95rem; }
+
+h1, h2, h3 { font-family: Oswald, sans-serif; margin: 0; letter-spacing: 0.02em; }
+h1 { font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 0.96; max-width: 14ch; margin: 0 auto; }
+.lead { max-width: 760px; margin: 18px auto 0; color: var(--muted); font-size: 1.05rem; line-height: 1.75; }
+
+.cta-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+.btn-primary { background: linear-gradient(180deg, var(--gold2), var(--gold)); color: #111; }
+.btn-secondary { background: rgba(255, 255, 255, 0.02); border-color: var(--line); color: var(--text); }
+.btn:focus-visible { outline: 3px solid var(--gold2); outline-offset: 3px; }
+
+.fleet {
+  margin: 16px auto 0;
+  display: inline-flex;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(242, 183, 5, 0.1);
+  border: 1px solid var(--line);
+  color: #f7e08a;
+  font-weight: 700;
+}
+
+.grid { margin-top: 28px; display: grid; gap: 18px; grid-template-columns: repeat(12, 1fr); }
+.panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(242, 183, 5, 0.18);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+.pricing { grid-column: span 7; }
+.book { grid-column: span 5; }
+.materials { grid-column: span 12; }
+
+h2 { color: var(--gold); font-size: clamp(1.9rem, 4vw, 3rem); margin-bottom: 12px; }
+h3 { font-size: 1.25rem; color: var(--text); }
+.price { font-family: Oswald, sans-serif; font-size: 2rem; margin-bottom: 10px; }
+.panel-copy { color: var(--muted); margin-top: 0; }
+ul { margin: 0; padding-left: 20px; line-height: 1.8; }
+
+.booking-form { display: grid; gap: 12px; }
+label { display: grid; gap: 7px; color: var(--muted); font-size: 0.92rem; }
+input, select, textarea {
+  width: 100%;
+  padding: 14px 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(242, 183, 5, 0.18);
+  background: #090909;
+  color: var(--text);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--gold2);
+  outline-offset: 1px;
+}
+textarea { resize: vertical; min-height: 110px; }
+.req { color: var(--gold); }
+
+.note {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(242, 183, 5, 0.2);
+  background: rgba(242, 183, 5, 0.08);
+  color: #f6e7b0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Confirmation panel shown after the form is submitted */
+.confirm { display: none; }
+.confirm.is-visible { display: block; }
+.confirm h3 { color: var(--gold); font-size: 1.6rem; }
+.summary {
+  margin: 14px 0 4px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #090909;
+  border: 1px solid rgba(242, 183, 5, 0.18);
+}
+.summary dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; }
+.summary dt { color: var(--muted); font-size: 0.9rem; }
+.summary dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.confirm-actions { display: grid; gap: 10px; margin-top: 16px; }
+.linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--gold);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.92rem;
+  justify-self: center;
+}
+
+.two-up { display: grid; gap: 18px; grid-template-columns: repeat(2, 1fr); }
+.material { margin-top: 12px; color: var(--muted); line-height: 1.7; }
+.material strong { color: var(--text); }
+
+.footer {
+  width: min(1140px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 44px;
+  text-align: center;
+  color: var(--muted);
+  border-top: 1px solid rgba(242, 183, 5, 0.14);
+}
+.phones { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+.phones a {
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 183, 5, 0.2);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@media (max-width: 900px) {
+  .pricing, .book, .materials { grid-column: span 12; }
+  .two-up { grid-template-columns: 1fr; }
+  .logo-mark { width: 100%; justify-content: center; }
+}
+</style>
+
+<!-- Local SEO: tells Google you are a real local business.
+     EDIT the address, areaServed, and geo below to match your actual service area. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "additionalType": "https://www.productontology.org/id/Dumpster",
+  "name": "Golden Haul Rentals",
+  "description": "Flat-rate 10-yard dumpster rental with delivery and pick-up included. 1 ton included, 3-day rental, no hidden fees.",
+  "url": "https://goldenhaulrentals.com/",
+  "telephone": "+1-313-505-7607",
+  "email": "bookings@goldenhaulrentals.com",
+  "priceRange": "$$",
+  "foundingDate": "2020",
+  "address": {
+    "@type": "PostalAddress",
+    "addressRegion": "MI",
+    "addressCountry": "US"
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Detroit" },
+    { "@type": "State", "name": "Michigan" }
+  ],
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    "opens": "07:00",
+    "closes": "19:00"
+  }],
+  "makesOffer": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "price": "370",
+    "itemOffered": {
+      "@type": "Service",
+      "name": "10-Yard Dumpster Rental",
+      "description": "10-yard roll-off dumpster. 1 ton included, 3-day rental, delivery and pick-up included. Extra weight $75/ton, extra days $20/day."
+    }
+  }
+}
+</script>
+</head>
+
+<body>
+<main class="shell">
+  <section class="hero">
+    <div class="logo-mark">
+      <div class="logo-trailer" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="#111">
+          <rect x="7" y="17" width="50" height="6" rx="3"></rect>
+          <path d="M11 26h42l-6 22H17z"></path>
+          <circle cx="22" cy="53" r="4"></circle>
+          <circle cx="42" cy="53" r="4"></circle>
+        </svg>
+      </div>
+      <div>
+        <div class="brand">Golden Haul Rentals</div>
+        <div class="tagline">Book online &bull; Pay before drop-off &bull; Fast local service</div>
+      </div>
+    </div>
+
+    <h1>Dumpster rental without the runaround.</h1>
+    <p class="lead">
+      One flat price, delivery and pick-up included, and a booking that takes about a minute.
+      Tell us where and when &mdash; we handle the rest.
+    </p>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#book">Book Now</a>
+      <a class="btn btn-secondary" id="heroCall" href="#">Call Us</a>
+    </div>
+
+    <div class="fleet" id="fleetPill"></div>
+  </section>
+
+  <section class="grid">
+    <article class="panel pricing">
+      <h2>Rental Pricing</h2>
+      <div class="price" id="priceHeadline"></div>
+      <ul id="priceList"></ul>
+    </article>
+
+    <article class="panel book" id="book">
+      <h2>Book &amp; Pay</h2>
+
+      <div id="formWrap">
+        <p class="panel-copy">
+          Send your request and we&rsquo;ll confirm your drop-off. Payment is required before delivery.
+        </p>
+
+        <form class="booking-form" id="bookingForm" novalidate>
+          <label>
+            <span>Full name <span class="req">*</span></span>
+            <input name="name" type="text" autocomplete="name" required />
+          </label>
+          <label>
+            <span>Phone number <span class="req">*</span></span>
+            <input name="phone" type="tel" autocomplete="tel" required />
+          </label>
+          <label>
+            <span>Email address <span class="req">*</span></span>
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            <span>Service address or ZIP code <span class="req">*</span></span>
+            <input name="address" type="text" autocomplete="street-address" required />
+          </label>
+          <label>
+            <span>Desired drop-off date <span class="req">*</span></span>
+            <input name="date" type="date" id="dateField" required />
+          </label>
+          <label>
+            <span>Dumpster size <span class="req">*</span></span>
+            <select name="size" required>
+              <option value="">Select size</option>
+              <option value="10-yard">10-yard</option>
+            </select>
+          </label>
+          <label>
+            <span>Notes</span>
+            <textarea name="notes" rows="4" placeholder="Access instructions, project details, or special requests"></textarea>
+          </label>
+          <button class="btn btn-primary" type="submit">Review &amp; Continue</button>
+        </form>
+      </div>
+
+      <div class="confirm" id="confirmPanel" role="status" tabindex="-1">
+        <h3>Almost done &mdash; here&rsquo;s your request</h3>
+        <div class="summary">
+          <dl id="summaryList"></dl>
+        </div>
+        <div class="confirm-actions">
+          <a class="btn btn-primary" id="sendEmailBtn" href="#">Send My Request</a>
+          <a class="btn btn-primary" id="payBtn" href="#" style="display:none">Pay Now &amp; Lock In My Date</a>
+          <a class="btn btn-secondary" id="confirmCall" href="#">Prefer to talk? Call us</a>
+          <button class="linkish" type="button" id="editBtn">Edit my details</button>
+        </div>
+        <div class="note" id="confirmNote"></div>
+      </div>
+    </article>
+
+    <article class="panel materials">
+      <div class="two-up">
+        <div>
+          <h3>Accepted Materials</h3>
+          <div class="material"><strong>Household:</strong> Furniture, appliances, mattresses, general debris.</div>
+          <div class="material"><strong>Construction:</strong> Drywall, wood, siding, concrete, brick, stone, asphalt.</div>
+          <div class="material"><strong>Yard Waste:</strong> Brush, branches, grass, leaves.</div>
+        </div>
+        <div>
+          <h3>Restricted Materials</h3>
+          <div class="material"><strong>Hazardous / Chemicals:</strong> Paint, pesticides, solvents, oils.</div>
+          <div class="material"><strong>Automotive:</strong> Tires, batteries, antifreeze, fluids.</div>
+          <div class="material"><strong>Flammable:</strong> Propane tanks, fuel, gasoline.</div>
+          <div class="material"><strong>Prohibited:</strong> Medical waste, asbestos, electronics.</div>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<footer class="footer">
+  <div>Golden Haul Rentals &bull; Locally owned and operated</div>
+  <div class="phones" id="footerPhones"></div>
+  <div style="margin-top:16px;font-size:0.85rem">
+    &copy; <span id="year"></span> Golden Haul Rentals. All rights reserved.
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var cfg = window.APP_CONFIG || {};
+  var $ = function (id) { return document.getElementById(id); };
+
+  function money(n) { return '$' + Number(n).toLocaleString('en-US'); }
+
+  function prettyPhone(raw) {
+    var d = String(raw || '').replace(/\D/g, '');
+    if (d.length === 11 && d.charAt(0) === '1') { d = d.slice(1); }
+    if (d.length !== 10) { return raw || ''; }
+    return '+1 (' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+  }
+
+  /* ---------- Pricing, fleet, phones: all driven by APP_CONFIG ---------- */
+
+  $('priceHeadline').textContent = '10-Yard Dumpster Rental: ' + money(cfg.PRICE_BASE);
+
+  var priceItems = [
+    cfg.INCLUDED_TONS + (cfg.INCLUDED_TONS === 1 ? ' ton included' : ' tons included'),
+    'Delivery &amp; pick-up included',
+    cfg.RENTAL_DAYS + '-day rental',
+    'No hidden fees',
+    'Extra weight: ' + money(cfg.EXTRA_TON) + ' per ton',
+    'After the ' + cfg.RENTAL_DAYS + '-day rental period: ' + money(cfg.EXTRA_DAY) + ' per additional day'
+  ];
+  $('priceList').innerHTML = priceItems.map(function (t) { return '<li>' + t + '</li>'; }).join('');
+
+  $('fleetPill').textContent = 'Current fleet: ' + cfg.FLEET_COUNT +
+    (cfg.FLEET_COUNT === 1 ? ' dumpster available' : ' dumpsters available');
+
+  var phones = [cfg.PHONE_PRIMARY, cfg.PHONE_SECONDARY].filter(Boolean);
+  $('heroCall').href = 'tel:' + phones[0];
+  $('heroCall').textContent = 'Call ' + prettyPhone(phones[0]);
+  $('confirmCall').href = 'tel:' + phones[0];
+  $('footerPhones').innerHTML = phones.map(function (p) {
+    return '<a href="tel:' + p + '">' + prettyPhone(p) + '</a>';
+  }).join('');
+
+  $('year').textContent = new Date().getFullYear();
+
+  /* ---------- No drop-off dates in the past ---------- */
+
+  var today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  $('dateField').min = today.toISOString().slice(0, 10);
+
+  /* ---------- Booking flow ---------- */
+
+  var form = $('bookingForm');
+  var formWrap = $('formWrap');
+  var confirmPanel = $('confirmPanel');
+
+  var LABELS = {
+    name: 'Name',
+    phone: 'Phone',
+    email: 'Email',
+    address: 'Service address',
+    date: 'Drop-off date',
+    size: 'Dumpster size',
+    notes: 'Notes'
+  };
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (!form.reportValidity()) { return; }
+
+    var data = {};
+    new FormData(form).forEach(function (value, key) {
+      data[key] = String(value).trim();
+    });
+
+    // On-page summary so the customer sees exactly what we received.
+    $('summaryList').innerHTML = Object.keys(LABELS)
+      .filter(function (k) { return data[k]; })
+      .map(function (k) {
+        return '<dt>' + LABELS[k] + '</dt><dd>' + escapeHtml(data[k]) + '</dd>';
+      }).join('');
+
+    // Prefilled email to the business — this is the lead record.
+    var lines = [
+      'New booking request from the Golden Haul Rentals website.',
+      '',
+      'Name: ' + data.name,
+      'Phone: ' + data.phone,
+      'Email: ' + data.email,
+      'Service address: ' + data.address,
+      'Desired drop-off date: ' + data.date,
+      'Dumpster size: ' + data.size,
+      'Notes: ' + (data.notes || 'None'),
+      '',
+      'Quoted: ' + money(cfg.PRICE_BASE) + ' flat rate, ' + cfg.INCLUDED_TONS +
+        ' ton included, ' + cfg.RENTAL_DAYS + '-day rental.',
+      'Payment required before drop-off.'
+    ];
+    $('sendEmailBtn').href = 'mailto:' + cfg.BOOKING_EMAIL +
+      '?subject=' + encodeURIComponent('Booking request — ' + data.name + ' — ' + data.date) +
+      '&body=' + encodeURIComponent(lines.join('\n'));
+
+    // Stripe: carry the customer's email and a reference we can match to the booking.
+    var payBtn = $('payBtn');
+    if (cfg.STRIPE_PAYMENT_URL) {
+      var ref = (data.name + '-' + data.date).replace(/[^a-zA-Z0-9-]/g, '').slice(0, 200);
+      var sep = cfg.STRIPE_PAYMENT_URL.indexOf('?') === -1 ? '?' : '&';
+      payBtn.href = cfg.STRIPE_PAYMENT_URL + sep +
+        'prefilled_email=' + encodeURIComponent(data.email) +
+        '&client_reference_id=' + encodeURIComponent(ref);
+      payBtn.textContent = 'Pay ' + money(cfg.PRICE_BASE) + ' Now & Lock In My Date';
+      payBtn.style.display = '';
+      $('confirmNote').textContent =
+        'Step 1: tap "Send My Request" so we get your details. Step 2: tap "Pay ' +
+        money(cfg.PRICE_BASE) + ' Now" to secure your date. Your dumpster is scheduled once payment clears.';
+    } else {
+      payBtn.style.display = 'none';
+      $('confirmNote').textContent =
+        'Tap "Send My Request" to email us your details. We’ll reply with a payment link and confirm your drop-off time. Payment is required before delivery.';
+    }
+
+    formWrap.style.display = 'none';
+    confirmPanel.classList.add('is-visible');
+    confirmPanel.focus();
+    confirmPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    track('Lead', { value: cfg.PRICE_BASE, currency: 'USD' });
+  });
+
+  $('editBtn').addEventListener('click', function () {
+    confirmPanel.classList.remove('is-visible');
+    formWrap.style.display = '';
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  $('payBtn').addEventListener('click', function () {
+    track('InitiateCheckout', { value: cfg.PRICE_BASE, currency: 'USD' });
+  });
+
+  /* ---------- Ad tracking (only runs if you set an ID above) ---------- */
+
+  function track(name, params) {
+    if (window.fbq) { window.fbq('track', name, params); }
+    if (window.gtag) { window.gtag('event', name, params); }
+  }
+
+  if (cfg.META_PIXEL_ID) {
+    /* eslint-disable */
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+    (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    /* eslint-enable */
+    window.fbq('init', cfg.META_PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+
+  if (cfg.GOOGLE_TAG_ID) {
+    var gs = document.createElement('script');
+    gs.async = true;
+    gs.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(cfg.GOOGLE_TAG_ID);
+    document.head.appendChild(gs);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', cfg.GOOGLE_TAG_ID);
+  }
+})();
+</script>
+</body>
 </html>
